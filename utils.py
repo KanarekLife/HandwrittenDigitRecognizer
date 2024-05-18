@@ -13,9 +13,9 @@ def parse_labels(dataset: Tensor) -> np.array:
 def normalize_image(image: Image) -> Image:
     should_invert = True
     if should_invert:
-        return ImageOps.invert(image.convert('L')).resize((28, 28))
+        return ImageOps.invert(image.convert('L')).resize((28, 28)).point(lambda x: 255 if x > 30 else 0)
     else:
-        return image.convert('L').resize((28, 28))
+        return image.convert('L').resize((28, 28)).point(lambda x: 255 if x > 30 else 0)
 
 def convert_from_image(image: Image) -> np.array:
     return np.array(normalize_image(image)).flatten()
