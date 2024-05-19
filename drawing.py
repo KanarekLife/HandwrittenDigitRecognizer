@@ -4,7 +4,7 @@ from torchvision import datasets
 from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
 from RandomForestTreeRecognizer import RandomForestTreeRecognizer
 from SVMRecognizer import SVMRecognizer
-from utils import normalize_image, center_image
+from utils import normalize_image, center_image, convert_to_image
 import time
 import numpy as np
 
@@ -35,6 +35,21 @@ recognizers = [
     SVMRecognizer(training_dataset)
 ]
 
+# get image for each class in dataset
+# for i in range(10):
+#     image = training_dataset.data[training_dataset.targets == i][0]
+#     image = convert_to_image(image.numpy())
+#     image.show()
+
+
+def display_helper_digit(digit: int):
+    clear_canvas()
+    digit_images = training_dataset.data[training_dataset.targets == digit]
+    random_index = np.random.randint(len(digit_images))
+    image = digit_images[random_index]
+    image = convert_to_image(image.numpy())
+    canvas.blit(pygame.image.fromstring(image.convert("RGB").tobytes(), (800, 600), "RGB"), (0, 0))
+
 # Function to clear the canvas
 def clear_canvas():
     canvas.fill(WHITE)
@@ -42,6 +57,8 @@ def clear_canvas():
 # Function to recognize the letter
 def recognize_letter():
     image = Image.frombytes("RGB", (canvas_width, canvas_height), pygame.image.tostring(canvas, "RGB"))
+
+    # center_image(normalize_image(image)).show()
 
     predictions = np.empty(len(recognizers), dtype=int)
     for i, recognizer in enumerate(recognizers):
@@ -76,6 +93,15 @@ while running:
             elif event.key == pygame.K_SPACE:  # Save canvas when spacebar is pressed
                 recognize_letter()
                 normalize_image(Image.frombytes("RGB", (canvas_width, canvas_height), pygame.image.tostring(canvas, "RGB"))).show()
+            elif event.key in [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9]:
+                display_helper_digit(int(chr(event.key)))
+            elif event.key == pygame.K_p:
+                image = Image.frombytes("RGB", (canvas_width, canvas_height), pygame.image.tostring(canvas, "RGB"))
+                center_image(normalize_image(image)).show()
+            elif event.key == pygame.K_s:
+                image = Image.frombytes("RGB", (canvas_width, canvas_height), pygame.image.tostring(canvas, "RGB"))
+                image.point(lambda x: 255 if x > 30 else 0).save("temp.png")
+            
 
     if drawing:
         current_pos = pygame.mouse.get_pos()

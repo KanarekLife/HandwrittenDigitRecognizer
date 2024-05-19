@@ -15,10 +15,19 @@ def parse_labels(dataset: Tensor) -> np.array:
 
 def normalize_image(image: Image) -> Image:
     should_invert = True
+
     if should_invert:
         return ImageOps.invert(image.convert('L')).resize((28, 28)).point(lambda x: 255 if x > 30 else 0)
     else:
         return image.convert('L').resize((28, 28)).point(lambda x: 255 if x > 30 else 0)
+    
+def denormalize_image(image: Image) -> Image:
+    should_invert = True
+
+    if should_invert:
+        return ImageOps.invert(image.resize((800, 600))).point(lambda x: 255 if x > 30 else 240)
+    else:
+        return image.resize((800, 600)).point(lambda x: 255 if x > 30 else 240)
     
 def center_image(image: Image) -> Image:
     # Convert image to grayscale
@@ -27,10 +36,15 @@ def center_image(image: Image) -> Image:
     # Get shape
     hh, ww = img.shape
 
+    w, h = None, None
+
     # Get contours (presumably just one around the nonzero pixels)
     contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for cntr in contours:
         x, y, w, h = cv2.boundingRect(cntr)
+
+    if w == None or h == None:
+        return image
 
     # Recenter
     startx = (ww - w) // 2
@@ -47,4 +61,4 @@ def convert_from_image(image: Image) -> np.array:
     return np.array(center_image(normalize_image(image))).flatten()
 
 def convert_to_image(arr: np.array) -> Image:
-    return Image.fromarray(arr.reshape((28, 28)))
+    return denormalize_image(Image.fromarray(arr.reshape(28, 28)))
