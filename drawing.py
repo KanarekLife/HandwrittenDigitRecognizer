@@ -3,7 +3,8 @@ from PIL import Image
 from torchvision import datasets
 from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
 from RandomForestTreeRecognizer import RandomForestTreeRecognizer
-from SVMRecognizer import SVMRecognizer
+from NonLinearSVMRecognizer import NonLinearSVMRecognizer
+from LinearSVMRecognizer import LinearSVMRecognizer
 from utils import normalize_image, center_image, convert_to_image
 import time
 import numpy as np
@@ -32,7 +33,8 @@ training_dataset = datasets.MNIST('./data', train=True, download=True)
 recognizers = [
     RandomForestTreeRecognizer(training_dataset),
     KNearestNeighborsRecognizer(training_dataset),
-    SVMRecognizer(training_dataset)
+    NonLinearSVMRecognizer(training_dataset),
+    LinearSVMRecognizer(training_dataset)
 ]
 
 # get image for each class in dataset
@@ -69,7 +71,8 @@ def recognize_letter():
     print("=====================================")
     print(f"RandomForestTreeRecognizer: {predictions[0]}")
     print(f"KNearestNeighborsRecognizer: {predictions[1]}")
-    print(f"SVMRecognizer: {predictions[2]}")
+    print(f"NonLinearSVMRecognizer: {predictions[2]}")
+    print(f"LinearSVMRecognizer: {predictions[3]}")
     print("=====================================")
 
 # Main game loop

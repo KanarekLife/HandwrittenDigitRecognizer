@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 
-class SVMRecognizer():
+class NonLinearSVMRecognizer():
     def __init__(self, dataset: Tensor):
         x = parse_data(dataset)
         y = parse_labels(dataset)

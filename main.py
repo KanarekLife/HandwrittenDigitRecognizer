@@ -3,7 +3,8 @@ from sklearn.preprocessing import scale
 from torchvision import datasets
 from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
 from RandomForestTreeRecognizer import RandomForestTreeRecognizer
-from SVMRecognizer import SVMRecognizer
+from NonLinearSVMRecognizer import NonLinearSVMRecognizer
+from LinearSVMRecognizer import LinearSVMRecognizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from utils import parse_data, parse_labels
@@ -14,7 +15,8 @@ training_dataset = datasets.MNIST('./data', train=True, download=True)
 recognizers = [
     RandomForestTreeRecognizer(training_dataset),
     KNearestNeighborsRecognizer(training_dataset),
-    SVMRecognizer(training_dataset)
+    NonLinearSVMRecognizer(training_dataset),
+    LinearSVMRecognizer(training_dataset)
 ]
 
 #Manual Tests
