@@ -1,0 +1,11 @@
+- Wstęp teoretyczny
+- Opis badanych metod:
+    - Opis teoretyczny metody
+    - Opis implementacji metody bazowej
+    - Opis poczynionych zmian / Prób zmian: parametry
+    - Wyniki (accuracy, confusion matrix, czas trenowania, czas predykcji)
+- Implementacja aplikacji
+    - Opis aplikacji
+    - Metody optymalizacji / normalizacji obrazu
+    - Podsumowanie i wyniki w praktyce
+- Podsumowanie
