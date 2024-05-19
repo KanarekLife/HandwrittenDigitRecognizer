@@ -4,8 +4,9 @@ from torchvision import datasets
 from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
 from RandomForestTreeRecognizer import RandomForestTreeRecognizer
 from SVMRecognizer import SVMRecognizer
-from utils import normalize_image
+from utils import normalize_image, center_image
 import time
+import numpy as np
 
 # Initialize Pygame
 pygame.init()
@@ -41,11 +42,17 @@ def clear_canvas():
 # Function to recognize the letter
 def recognize_letter():
     image = Image.frombytes("RGB", (canvas_width, canvas_height), pygame.image.tostring(canvas, "RGB"))
-    predictions = [recognizer.recognize(image) for recognizer in recognizers]
+
+    predictions = np.empty(len(recognizers), dtype=int)
+    for i, recognizer in enumerate(recognizers):
+        recognizer_predictions = np.array([recognizer.recognize(image) for _ in range(10)])
+        most_common_prediction = np.argmax(np.bincount(recognizer_predictions))
+        predictions[i] = most_common_prediction
+
     print("=====================================")
-    print(f"Random Forest: {predictions[0]}")
-    print(f"KNN: {predictions[1]}")
-    print(f"SVM: {predictions[2]}")
+    print(f"RandomForestTreeRecognizer: {predictions[0]}")
+    print(f"KNearestNeighborsRecognizer: {predictions[1]}")
+    print(f"SVMRecognizer: {predictions[2]}")
     print("=====================================")
 
 # Main game loop
@@ -73,6 +80,7 @@ while running:
     if drawing:
         current_pos = pygame.mouse.get_pos()
         pygame.draw.line(canvas, BLACK, last_pos, current_pos, 15)
+        pygame.draw.circle(canvas, BLACK, current_pos, 7)
         anything_changed_since_last_recognition = True
         last_pos = current_pos
         last_draw_time = time.time()
