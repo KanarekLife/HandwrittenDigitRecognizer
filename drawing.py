@@ -18,7 +18,7 @@ WHITE = (255, 255, 255)
 
 # Set up the canvas
 canvas_width = 800
-canvas_height = 600
+canvas_height = 800
 canvas = pygame.display.set_mode((canvas_width, canvas_height))
 canvas.fill(WHITE)
 pygame.display.set_caption("Paint Application")
