@@ -15,8 +15,9 @@ class RandomForestTreeRecognizer():
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
         if not Path('temp/random_forest_model.pkl').exists():
             self.clf = RandomForestClassifier()
-            print("Training the model...")
+            print("Training the Random Forest Tree model...")
             self.clf.fit(x_train, y_train)
+            Path('temp').mkdir(exist_ok=True)
             joblib.dump(self.clf, 'temp/random_forest_model.pkl')
             print("Model trained.")
             print(f"Accuracy: {self.clf.score(x_test, y_test)}")

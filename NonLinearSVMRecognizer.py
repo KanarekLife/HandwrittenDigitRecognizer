@@ -16,7 +16,7 @@ class NonLinearSVMRecognizer():
         x_train, x_test, y_train, y_test = train_test_split(scale(x), y, test_size=0.2, random_state=42)
         if not Path('temp/svm_recognizer.pkl').exists():
             self.svc = SVC(kernel='rbf', C=10, gamma=0.001)
-            print("Training the model...")
+            print("Training the Non-Linear SVM model...")
             self.svc.fit(x_train, y_train)
             joblib.dump(self.svc, 'temp/svm_recognizer.pkl')
             print("Model trained.")
