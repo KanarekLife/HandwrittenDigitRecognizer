@@ -23,6 +23,10 @@ recognizers = [
 
 # Initialize Pygame
 pygame.init()
+pygame.font.init()
+
+# set up the font
+myfont = pygame.font.SysFont('Arial', 24)
 
 # Set up colors
 BLACK = (0, 0, 0)
@@ -42,8 +46,16 @@ canvas.fill(WHITE)
 # Set up the drawing variables
 drawing = False
 last_pos = None
-recognizing = False
 last_draw_time = time.time()
+
+# Set up recognition variables
+recognizing = False
+predictions = np.empty(len(recognizers), dtype=int)
+predictions.fill(-1)
+
+# Prepare labels
+processed_label = myfont.render("Models' input:", True, BLACK)
+recognizing_label = myfont.render("Recognizing...", True, BLACK)
 
 # get image for each class in dataset
 # for i in range(10):
@@ -67,12 +79,12 @@ def clear_canvas():
 # Function to recognize the letter
 def recognize_letter():
     global recognizing
+    global predictions
 
     image = Image.frombytes("RGB", (screen_width, screen_height), pygame.image.tostring(canvas, "RGB"))
 
     # center_image(normalize_image(image)).show()
 
-    predictions = np.empty(len(recognizers), dtype=int)
     for i, recognizer in enumerate(recognizers):
         recognizer_predictions = np.array([recognizer.recognize(image) for _ in range(10)])
         most_common_prediction = np.argmax(np.bincount(recognizer_predictions))
@@ -124,6 +136,8 @@ while running:
             elif event.key == pygame.K_s:
                 image = Image.frombytes("RGB", (screen_width, screen_height), pygame.image.tostring(canvas, "RGB"))
                 image.point(lambda x: 255 if x > 30 else 0).save("temp.png")
+            elif event.key == pygame.K_q:
+                running = False
             
 
     if drawing:
@@ -140,9 +154,20 @@ while running:
 
     screen.blit(canvas, (0, 0))
 
+    # Draw the processed image
     processed_image = image_to_surface(get_processed_image())
     processed_image = pygame.transform.scale(processed_image, (56, 56))
+    screen.blit(processed_label, (screen.get_width() - processed_image.get_width() - processed_label.get_width() - 10, processed_image.get_height()/2 - processed_label.get_height()/2))
     screen.blit(processed_image, (screen.get_width() - processed_image.get_width(), 0))
+
+    # Draw recognition results
+    for i, recognizer in enumerate(recognizers):
+        text = myfont.render(f"{recognizer.__class__.__name__}: {predictions[i]}", True, BLACK)
+        screen.blit(text, (10, 10 + i * 30))
+
+    # Draw recognition status
+    if recognizing:
+        screen.blit(recognizing_label, (10, screen.get_height() - recognizing_label.get_height() - 10))
 
     pygame.display.flip()
 
