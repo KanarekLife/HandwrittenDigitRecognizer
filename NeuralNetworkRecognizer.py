@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
 from pathlib import Path
+import numpy as np
 from utils import center_image, normalize_image
 
 MODEL_PATH = Path('models/nn_model.pth')
@@ -86,3 +87,11 @@ class NeuralNetworkRecognizer:
         output = self.network(data)
         pred = output.data.max(1, keepdim=True)[1]
         return pred.item()
+
+    def recognize_batch(self, data: np.ndarray) -> np.ndarray:
+        data = data.astype(np.float32)
+        data = torch.from_numpy(data).to(self.device)
+        data = data.view(-1, 1, 28, 28)
+        output = self.network(data)
+        pred = output.data.max(1, keepdim=True)[1]
+        return pred.numpy().flatten()

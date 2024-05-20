@@ -5,6 +5,7 @@ from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
 from RandomForestTreeRecognizer import RandomForestTreeRecognizer
 from NonLinearSVMRecognizer import NonLinearSVMRecognizer
 from LinearSVMRecognizer import LinearSVMRecognizer
+from NeuralNetworkRecognizer import NeuralNetworkRecognizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from utils import parse_data, parse_labels
@@ -16,7 +17,8 @@ recognizers = [
     RandomForestTreeRecognizer(training_dataset),
     KNearestNeighborsRecognizer(training_dataset),
     NonLinearSVMRecognizer(training_dataset),
-    LinearSVMRecognizer(training_dataset)
+    LinearSVMRecognizer(training_dataset),
+    NeuralNetworkRecognizer(training_dataset, 'cpu', 14),
 ]
 
 #Manual Tests
@@ -35,6 +37,7 @@ y_expected = parse_labels(test_dataset)
 random_forest_predictions = recognizers[0].recognize_batch(x_test)
 knn_predictions = recognizers[1].recognize_batch(x_test)
 svm_predictions = recognizers[2].recognize_batch(scale(x_test))
+nn_predictions = recognizers[4].recognize_batch(x_test)
 
 plt.matshow(confusion_matrix(y_expected, random_forest_predictions))
 plt.title("Random Forest Confusion Matrix")
@@ -44,4 +47,7 @@ plt.title("KNN Confusion Matrix")
 plt.show()
 plt.matshow(confusion_matrix(y_expected, svm_predictions))
 plt.title("NonLinear SVM Confusion Matrix")
+plt.show()
+plt.matshow(confusion_matrix(y_expected, nn_predictions))
+plt.title("Neural Network Confusion Matrix")
 plt.show()
