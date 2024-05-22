@@ -10,6 +10,8 @@ from utils import normalize_image, center_image, convert_to_image
 import time
 import numpy as np
 import threading
+import datetime
+import concurrent.futures
 
 # Set up the recognizer
 training_dataset = datasets.MNIST('./data', train=True, download=True)
@@ -37,7 +39,7 @@ screen_width = 800
 screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 screen.fill(WHITE)
-pygame.display.set_caption("Paint Application")
+pygame.display.set_caption("Handwritten Digit Recognition")
 
 # Set up the canvas
 canvas = pygame.Surface((screen.get_width(), screen.get_height()))
@@ -57,12 +59,6 @@ predictions.fill(-1)
 processed_label = myfont.render("Models' input:", True, BLACK)
 recognizing_label = myfont.render("Recognizing...", True, BLACK)
 
-# get image for each class in dataset
-# for i in range(10):
-#     image = training_dataset.data[training_dataset.targets == i][0]
-#     image = convert_to_image(image.numpy())
-#     image.show()
-
 
 def display_helper_digit(digit: int):
     clear_canvas()
@@ -72,23 +68,24 @@ def display_helper_digit(digit: int):
     image = convert_to_image(image.numpy())
     canvas.blit(pygame.image.fromstring(image.convert("RGB").tobytes(), (800, 600), "RGB"), (0, 0))
 
-# Function to clear the canvas
 def clear_canvas():
     canvas.fill(WHITE)
 
-# Function to recognize the letter
 def recognize_letter():
     global recognizing
     global predictions
 
     image = Image.frombytes("RGB", (screen_width, screen_height), pygame.image.tostring(canvas, "RGB"))
 
-    # center_image(normalize_image(image)).show()
-
-    for i, recognizer in enumerate(recognizers):
+    def recognize_parallel(recognizer):
         recognizer_predictions = np.array([recognizer.recognize(image) for _ in range(10)])
         most_common_prediction = np.argmax(np.bincount(recognizer_predictions))
-        predictions[i] = most_common_prediction
+        return most_common_prediction
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = [executor.submit(recognize_parallel, recognizer) for recognizer in recognizers]
+        for i, future in enumerate(concurrent.futures.as_completed(futures)):
+            predictions[i] = future.result()
 
     print("=====================================")
     print(f"RandomForestTreeRecognizer: {predictions[0]}")
@@ -110,6 +107,7 @@ def image_to_surface(image: Image) -> pygame.Surface:
 # Main game loop
 running = True
 anything_changed_since_last_recognition = False
+color = BLACK
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -117,33 +115,36 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left mouse button
                 drawing = True
+                color = BLACK
+                last_pos = event.pos
+                last_draw_time = time.time()
+            elif event.button == 3:
+                drawing = True
+                color = WHITE
                 last_pos = event.pos
                 last_draw_time = time.time()
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:  # Left mouse button
                 drawing = False
+            elif event.button == 3:
+                drawing = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_c:  # Clear canvas when 'c' is pressed
                 clear_canvas()
-            elif event.key == pygame.K_SPACE:  # Save canvas when spacebar is pressed
-                recognize_letter()
-                normalize_image(Image.frombytes("RGB", (screen_width, screen_height), pygame.image.tostring(canvas, "RGB"))).show()
             elif event.key in [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9]:
                 display_helper_digit(int(chr(event.key)))
-            elif event.key == pygame.K_p:
-                image = Image.frombytes("RGB", (screen_width, screen_height), pygame.image.tostring(canvas, "RGB"))
-                center_image(normalize_image(image)).show()
             elif event.key == pygame.K_s:
                 image = Image.frombytes("RGB", (screen_width, screen_height), pygame.image.tostring(canvas, "RGB"))
-                image.point(lambda x: 255 if x > 30 else 0).save("temp.png")
+                filename = datetime.datetime.now().strftime("%Y%m%d%H%M%S") + ".png"
+                image.point(lambda x: 255 if x > 30 else 0).save(filename)
             elif event.key == pygame.K_q:
                 running = False
             
 
     if drawing:
         current_pos = pygame.mouse.get_pos()
-        pygame.draw.line(canvas, BLACK, last_pos, current_pos, 15)
-        pygame.draw.circle(canvas, BLACK, current_pos, 7)
+        pygame.draw.line(canvas, color, last_pos, current_pos, 15)
+        pygame.draw.circle(canvas, color, current_pos, 7)
         anything_changed_since_last_recognition = True
         last_pos = current_pos
         last_draw_time = time.time()
