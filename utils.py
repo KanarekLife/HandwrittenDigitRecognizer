@@ -4,6 +4,25 @@ from PIL import Image, ImageOps
 import cv2
 import numpy as np
 from PIL import Image
+import os
+
+TRAINING_REPORT_FILENAME = "training_report.txt"
+TESTING_REPORT_FILENAME = "testing_report.txt"
+
+
+def append_to_report(text: str, report_type = "training") -> None:
+    if report_type == "training":
+        with open(TRAINING_REPORT_FILENAME, "a") as report_file:
+            report_file.write(text + "\n")
+    
+    elif report_type == "testing":
+        with open(TESTING_REPORT_FILENAME, "a") as report_file:
+            report_file.write(text + "\n")
+
+def remove_existing_reports() -> None:
+    if os.path.exists(TRAINING_REPORT_FILENAME):
+        os.remove(TRAINING_REPORT_FILENAME)
+
 
 def parse_data(dataset: Tensor) -> np.array:
     arr = dataset.data.numpy()

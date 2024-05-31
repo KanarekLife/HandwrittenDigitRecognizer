@@ -1,4 +1,4 @@
-from utils import parse_data, parse_labels, convert_from_image
+from utils import parse_data, parse_labels, convert_from_image, append_to_report
 from torch import Tensor
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -21,6 +21,7 @@ class RandomForestTreeRecognizer():
             joblib.dump(self.clf, 'temp/random_forest_model.pkl')
             print("Model trained.")
             print(f"Accuracy: {self.clf.score(x_test, y_test)}")
+            append_to_report(f"Random Forest Tree Model Accuracy: {self.clf.score(x_test, y_test)}")
         else:
             self.clf = joblib.load('temp/random_forest_model.pkl')
         
