@@ -1,4 +1,4 @@
-from utils import parse_data, parse_labels, convert_from_image
+from utils import parse_data, parse_labels, convert_from_image, append_to_report
 from torch import Tensor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
@@ -22,6 +22,7 @@ class LinearSVMRecognizer():
             joblib.dump(self.svc, 'temp/svm_recognizer_lin.pkl')
             print("Model trained.")
             print(f"Accuracy: {self.svc.score(x_test, y_test)}")
+            append_to_report(f"Linear SVM Model Accuracy: {self.svc.score(x_test, y_test)}")
         else:
             self.svc = joblib.load('temp/svm_recognizer_lin.pkl')
         

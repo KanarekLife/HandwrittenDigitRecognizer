@@ -1,4 +1,4 @@
-from utils import parse_data, parse_labels, convert_from_image
+from utils import parse_data, parse_labels, convert_from_image, append_to_report
 from torch import Tensor
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -20,7 +20,9 @@ class KNearestNeighborsRecognizer():
             Path('temp').mkdir(exist_ok=True)
             joblib.dump(self.knn, 'temp/knn_model.pkl')
             print("Model trained.")
-            print(f"Accuracy: {self.knn.score(x_test, y_test)}")
+            accuracy = self.knn.score(x_test, y_test)
+            print(f"Accuracy: {accuracy}")
+            append_to_report(f"KNearest Neighbors Model Accuracy: {accuracy}")
         else:
             self.knn = joblib.load('temp/knn_model.pkl')
         

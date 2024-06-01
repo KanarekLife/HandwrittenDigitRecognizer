@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from PIL import Image
 from pathlib import Path
 import numpy as np
-from utils import center_image, normalize_image
+from utils import center_image, normalize_image, append_to_report
 
 MODEL_PATH = Path('models/nn_model.pth')
 
@@ -79,6 +79,8 @@ class NeuralNetworkRecognizer:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), loss.item()))
+
+                append_to_report(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)} ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item()}")
 
     def recognize(self, image: Image) -> int | None:
         image = center_image(normalize_image(image))
