@@ -1,11 +1,11 @@
 import pygame
 from PIL import Image
 from torchvision import datasets
-from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
-from RandomForestTreeRecognizer import RandomForestTreeRecognizer
-from NonLinearSVMRecognizer import NonLinearSVMRecognizer
-from LinearSVMRecognizer import LinearSVMRecognizer
-from NeuralNetworkRecognizer import NeuralNetworkRecognizer
+from recognizers.KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
+from recognizers.RandomForestTreeRecognizer import RandomForestTreeRecognizer
+from recognizers.NonLinearSVMRecognizer import NonLinearSVMRecognizer
+from recognizers.LinearSVMRecognizer import LinearSVMRecognizer
+from recognizers.NeuralNetworkRecognizer import NeuralNetworkRecognizer
 from utils import normalize_image, center_image, convert_to_image
 import time
 import numpy as np
