@@ -6,9 +6,10 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 import time
+import lzma
 from .Recognizer import Recognizer
 
-MODEL_PATH = Path('models/random_forest_model.pkl')
+MODEL_PATH = Path('models/random_forest_model.pkl.xz')
 
 class RandomForestTreeRecognizer(Recognizer):
     def __init__(self, dataset: Tensor):
@@ -21,11 +22,19 @@ class RandomForestTreeRecognizer(Recognizer):
             start_time = time.time()
             self.clf.fit(x, y)
             elapsed_time = time.time() - start_time
-            MODEL_PATH.parent.mkdir(exist_ok=True)
-            joblib.dump(self.clf, MODEL_PATH)
+            self.save()
             print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
         else:
-            self.clf = joblib.load(MODEL_PATH)
+            self.load()
+
+    def save(self):
+        MODEL_PATH.parent.mkdir(exist_ok=True)
+        with lzma.open(MODEL_PATH, 'wb') as f:
+            joblib.dump(self.clf, f)
+
+    def load(self):
+        with lzma.open(MODEL_PATH, 'rb') as f:
+            self.clf = joblib.load(f)
 
     def recognize(self, data: Image) -> int | None:
         arr = convert_from_image(data)

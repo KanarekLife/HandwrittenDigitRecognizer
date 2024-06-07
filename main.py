@@ -5,15 +5,12 @@ from recognizers.all_recognizers import (RandomForestTreeRecognizer, KNearestNei
 from recognizers.Recognizer import Recognizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
-from utils import parse_data, parse_labels, append_to_report, remove_existing_reports
+from utils import parse_data, parse_labels
 from PIL import Image
 import numpy as np
 import time
 
 training_dataset = datasets.MNIST('./data', train=True, download=True)
-
-remove_existing_reports()
-append_to_report("Training the models...\n")
 
 recognizers: dict[str, Recognizer] = {
     "Random Forest Tree": RandomForestTreeRecognizer(training_dataset),
@@ -29,7 +26,6 @@ for file in os.listdir("test_data/"):
     print(f"Testing {file}")
     for name, recognizer in recognizers.items():
         print(f"{file}: {name} recognized {recognizer.recognize(image)}")
-        append_to_report(f"{file}: {name} recognized {recognizer.recognize(image)}", "testing")
 
 print()
 
@@ -48,7 +44,6 @@ print("Training predictions:")
 for name, prediction in predictions_train.items():
     accuracy = sum(prediction == y_train) / len(y_train)
     print(f"{name} accuracy: {accuracy:.4f}")
-    append_to_report(f"{name} accuracy: {accuracy:.4f}", "training")
 
 test_dataset = datasets.MNIST('./data', train=False, download=True)
 x_test = parse_data(test_dataset)
@@ -67,7 +62,6 @@ print("Test predictions:")
 for name, prediction in predictions_test.items():
     accuracy = sum(prediction == y_test) / len(y_test)
     print(f"{name} accuracy: {accuracy:.4f}")
-    append_to_report(f"{name} accuracy: {accuracy:.4f}", "testing")
 
 for name, prediction in predictions_test.items():
     confusion = confusion_matrix(y_test, prediction)
