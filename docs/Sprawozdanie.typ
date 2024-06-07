@@ -28,14 +28,6 @@
 ]
 
 #pagebreak()
-#text(red)[
-  = Zastrzeżenia
-  Kanarek, w tej chwili accuracy liczone jest na 20% danych treningowych, a trenujesz na 80%. Zmień. \ 
-  Bartek, odpal u siebie nowego maina z tworzeniem raportu z treningu. Zebrane dane umieścimy w sprawozdaniu. \
-  Wszyscy, dopisać obserwacje i wnioski końcowe. \
-]
-
-#pagebreak()
 
 #align(top)[
 #outline(title: "Spis treści", target: heading.where(depth: 1))
@@ -43,88 +35,93 @@
 #pagebreak()
 
 = Opis zadania
-Jako projekt zaliczeniowy z przedmiotu Sztuczna inteligencja zdecydowaliśmy się na analizę różnych metod rozpoznawania cyfr pisanych odręcznie. Celem projektu jest ich porównanie. W projekcie użyto 5 metod: k-najbliższych sąsiadów (ang. k-nearest neighbors), liniowa maszyna wektorów nośnych (ang. linear SVM recogniser), nieliniowa maszyna wektorów nośnych (ang. non-linear SVM recogniser), losowy las decyzyjny (ang. random decision forests) oraz sieć neuronowa (ang. neural network). Projekt zrealizowano w języku Python, wykorzystując biblioteki: numpy, matplotlib, scikit-learn, tensorflow, keras. 
+Niniejszy projekt zaliczeniowy z przedmiotu Sztuczna inteligencja przedstawia analizę różnych metod rozpoznawania cyfr pisanych odręcznie. Badane zagadnienie należy do dziedziny rozpoznawania obrazów (ang. computer vision), która skupia się na umożliwieniu komputerom rozumienia oraz interpretowania wizualnych danych ze świata zewnętrznego. Rozpoznawanie cyfr, w szczególności pisanych odręcznie, jest jednym z podstawowych problemów w dziedzinie rozpoznawania obrazów, dla którego opracowanie skutecznych metod znacząco zwiększa wydajność pracy i umożliwia efektywne przetwarzanie informacji utrwalonych na nieelektronicznych nośnikach danych. Jest to też problem z życia wzięty, ponieważ w praktyce spotykamy się z ręcznie pisanych cyframi na kartach pocztowych, formularzach, czy dokumentach urzędowych.
+\ 
+W niniejszej pracy zostaną omówione różnorodne podejścia do rozpoznawania cyfr, z naciskiem na techniki sztucznej inteligencji. Porównano sprawczość różnych metod rozpoznawania cyfr: k-najbliżsi sąsiedzi (ang. k-nearest neighbors), liniowa maszyna wektorów nośnych (ang. linear SVM recogniser), nieliniowa maszyna wektorów nośnych (ang. non-linear SVM recogniser), losowy las decyzyjny (ang. random decision forests) oraz sieć neuronowa (ang. convolutional neural network). 
+#text(purple)[Zbadano również wpływ różnych parametów na osiągi sieci neuronowej]. 
+\ 
+Projekt zrealizowano w języku Python, wykorzystując biblioteki: numpy, matplotlib, scikit-learn, tensorflow, keras. 
+
 = Opis zbioru danych
-Zbiór danych to MNIST opracowany przez National Institute of Standards and Technology (agencja rządowa USA odpowiedzialna za rozwój i promocję produktów przemysłu USA). Wykorzystano wersję dostępną w bibliotece `pytorch`. Zbiór ten zawiera łącznie 70 000 obrazów przedstawiających cyfry o rozmiarze 28x28 pikseli pisanych odręcznie, białym tuszem na czarnym tle. 60 000 z nich to dane treningowe (pobierane z pliku `train-images-idx3-ubyte`) a pozostałe 10 000 to dane testowe (pobierane z pliku `t10k-images-idx3-ubyte`). Dane z obrazu są interpretowane jako macierz 26 x 26 z wartościami pikseli w skali szarości o kolorze z zakresu [0, 255], gdzie 0 oznacza kolor czarny, a 255 kolor biały. Każda cyfra jest przypisana do jednej z 10 klas oznaczających jej wartość [0, 9].
+Zbiór danych, na których trenowano i testowano modele to MNIST opracowany przez National Institute of Standards and Technology (agencja rządowa USA odpowiedzialna za rozwój i promocję produktów przemysłu USA). Zbiór ten zawiera łącznie 70 000 obrazów przedstawiających cyfry o rozmiarze 28x28 pikseli pisanych odręcznie, białym tuszem na czarnym tle. 60 000 z nich to dane treningowe (pobierane z pliku `train-images-idx3-ubyte`) a pozostałe 10 000 to dane testowe (pobierane z pliku `t10k-images-idx3-ubyte`). Dane z obrazu są interpretowane jako macierz 26 x 26 z wartościami pikseli w skali szarości o kolorze z zakresu [0, 255], gdzie 0 oznacza kolor czarny, a 255 kolor biały. Każda cyfra jest przypisana do jednej z 10 klas oznaczających jej wartość [0, 9]. 
+\
+Wykorzystano dataset MNIST dostarczony wraz z biblioteką `pytorch`. Dodatkowo pobraliśmy próbki od 
+#text(purple)[N = 10] osób, które rysowały przy użyciu myszki cyfry od 0 do 9. Celem tego działania była chęć sprawdzenia skuteczności modeli na danych, które nie pochodzą z datasetu MNIST a ze świata rzeczywistego. Obecnie w coraz większej ilości miejsc możemy spotkać się z pobieraniem tekstu od użytkownika przez rysowanie na ekranie myszką (lub rysikiem - nietestowane ze względu na brak urządzenia do pobrania takowej próbki), dlatego warto sprawdzić, jakie wyniki osiągną modele na takich danych.
 
 
 = Opis badanych metod
 == K-najbliżsi sąsiedzi
-Metoda k-najbliższych sąsiadów (ang. k-nearest neighbors, KNN) jest jedną z najprostszych metod klasyfikacji. 
-Podjęcie decyzji o przynależności do klasy oparte jest na ocenie przynależności do klas k najbliższych punktów ze zbioru referencyjnego w przestrzeni cech. Użyto metody `KNeighborsClassifier()` z biblioteki `scikit-learn`. Wybrano domyślne parametry dla trenowania modelu, w szczególności parametr `n_neighbors` ustawiono na 5. Według literatury, metoda dobrze sprawdza się w przypadku problemów klasyfikacji, gdzie granica decyzyjna jest złożona i nieregularna. 
+Metoda k-najbliższych sąsiadów (ang. k-nearest neighbors, KNN) jest jedną z najprostszych, a jednocześnie najbardziej intuicyjnych algorytmów klasyfikacji stosowanych w uczeniu maszynowym. Algorytm KNN działa na zasadzie "głosowania" wśród najbliższych sąsiadów danego punktu w przestrzeni cech. Proces klasyfikacji nowej próbki sprowadza się do znalezienia `K` najbliższych punktów treningowych (w metryce euklidesowej). Przypisana klasa dla badanej próbki jest taka, jak klasa najczęściej reprezentowana wśród sąsiadów. 
+#figure(image("KNN_diagram.png"), caption: "Schemat działania algorytmu K-najbliższych sąsiadów.")
+\
+Przedmiotem badań jest metoda `KNeighborsClassifier()` z biblioteki `scikit-learn`, która implementuje opisaną wyżej metodę. Wybrano domyślne parametry dla trenowania modelu, w szczególności parametr `n_neighbors` ustawiono na 5. Parametr `n_neighbors` oznacza liczbę najbliższych sąsiadów, którzy mają wpływ na klasyfikację nowej próbki (utożsamiać z `k`). Zdecydowano się na takowe patrametry, ponieważ zgodnie z literaturą i uprzednio przeprowadzonymi badaniami, dla takich wartości model osiąga najlepsze możliwe wyniki.
 
 == Liniowa maszyna wektorów nośnych
-Liniowa maszyna wektorów nośnych (Linear Support Vector Machine) to popularny algorytm klasyfikacji, który stara się znaleźć najlepszą linię, która maksymalnie oddziela klasy danych. Algorytm stara się znaleźć taką linię, która rozdziela dane na różne klasy maksymalizując marginesy, czyli odległości między linią a najbliższymi punktami danych z każdej klasy. Użyto metody `SVC()` z biblioteki `scikit-learn` z parametrem `kernel='linear'`. Uczenie polega na maksymalizacji marginesu przy jednoczesnym minimalizowaniu wartości kar dla źle rozdzielonych klas.
+W ogólności SVM (Support Vector Machine, maszyna wektorów nośnych) to nadzorowana metoda uczenia, która służy do klasyfikacji danych przez znalezienie hiperpłaszczyzny, który maksymalizuje margines (tj. odległość między najbliższymi punktami z różnych klas a rzeczoną hiperpłaszczyzną) między klasami danych. W przypadku liniowej SVM hiperpłaszczyzna jest prostą. Algorytm stara się dobrać prostą tak, aby maksymalizować margines. Stosuje się też funkcję kosztu, dzięki której minimalizujemy błędy klasyfikacji przy jednoczesnym maksymalizacji marginesu.
+#figure(image("LinearSVM_diagram.png"), caption: "Schemat działania algorytmu liniowej maszyny wektorów.")
+\
+W projekcie użyto metody `LinearSVC()` z biblioteki `scikit-learn` z parametrami domyślnymi, poza `dual='auto'`, który określa wartość tego parametru automatycznie, na podstawie dostarczonych danych i obranej strategii karania. Nie zdecydowano się na edytowanie innych parametrów, ponieważ zgodnie z literaturą, domyślne wartości są optymalne dla tego typu problemów i gwarantują możliwie najlepsze dane.
 
 == Nieliniowa maszyna wektorów nośnych
-Nieliniowa maszyna wektorów nośnych (Non-linear Support Vector Machine) to rozszerzenie liniowej maszyny wektorów nośnych, które pozwala na rozdzielenie danych nieliniowych. W tym celu wykorzystuje się funkcję jądra (ang. kernel), która mapuje dane do przestrzeni o wyższej wymiarowości, licząc na to, że dane są w niej liniowo separowalne. Użyto metody `SVC()` z biblioteki `scikit-learn` z parametrem `kernel='rbf'` - przyjęto jądro Gaussa, `C=10` - skala regularyzacji, `gamma=0.001` - współczynnik jądra. Uczenie polega na znalezieniu hiperpłaszczyzny, która najlepiej separuje dane w przestrzeni cech. Według literatury, metoda ta dobrze sprawdza się w przypadku danych nieliniowo separowalnych o skomplikowanej strukturze.
+Nieliniowa maszyna wektorów nośnych (Non-linear Support Vector Machine) to uogólnienie liniowej maszyny wektorów nośnych, które pozwala na rozdzielenie danych nieliniowych. W tym celu wykorzystuje się funkcję jądra (ang. kernel), która mapuje dane do przestrzeni o wyższej wymiarowości, licząc na to, że dane są w niej liniowo separowalne, tzn. istnieje hiperpłaszczyzna lub granica decyzyjna, która najlepiej oddzieli klasy danych.
+#figure(image("NonlinearSVM_diagram.png"), caption: "Przykład hiperpłaszczyzny podziału danych dla jądra Gaussa dla nieliniowej maszyny wektorów.")
+\ 
+Zbadano nieliniową maszynę wektorów nośnych realizowaną przez metodą `SVC()` z biblioteki `scikit-learn`. Większość parametów ustawiono na wartości domyślne, poza `kernel='rbf'`- przyjęto jądro Gaussa, `C=10` - skala regularyzacji dla funkcji minimalizującej stratę (loss), `gamma=0.001` - współczynnik jądra regulujący wpływ poszczególnej próbki na ustalenie granicy decyzji. Zdecydowano się na modyfikację większej ilości parametrów niż poprzednio celem maksymalnego dostosowania modelu do specyfiki danych. Wartości dobrano bazując na literaturze i wcześniejszych badaniach. Warto zwrócić uwagę na zapis w dokumentacji `The fit time scales at least quadratically with the number of samples and may be impractical beyond tens of thousands of samples.`, co dla naszego zbioru danych sprawia, że trening jest czasochłonny.
 
 == Losowy las decyzyjny
-Losowy las decyzyjny (Random Decision Forests) to metoda klasyfikacji, która polega na zbudowaniu wielu drzew decyzyjnych i wybraniu klasy, która jest najczęściej wybierana przez poszczególne drzewa (zasada "mądrości tłumu", każda próbka do oceny jest analizowana przez każde z drzew). Drzewa są trenowane na podzbiorze losowo wybranych cech przy jednoczesnej redukcji overfittingu. Użyto metody `RandomForestClassifier()` z biblioteki `scikit-learn` z domyślnymi parametrami. Według literatury, metoda ta dobrze sprawdza się w przypadku dużych zbiorów danych, gdzie granica decyzyjna jest złożona i nieregularna.
+Losowy las decyzyjny (Random Decision Forests) to metoda klasyfikacji oparta o budowanie lasu losowych drzew decyzyjnych. Zbieranie wyników opiera się na zasadzie agregacji rezultatów z poszczególnych drzew (zasada "mądrości tłumu"). Ma to również na celu poprawę dokładności klasyfikacji i zmniejszenia ryzyka przeuczenia (overfittingu). Każde drzewo decyzyjne  jest zbudowane na podstawie losowego podzbioru danych treningowych i losowego podzbioru cech.
+#figure(image("RandomForestTree_diagram.png"), caption: "Wizualizacja działania algorytmu losowego lasu decyzyjnego.")
+\
+Zbadano metodę `RandomForestClassifier()` z biblioteki `scikit-learn` z domyślnymi parametrami. Ustawiono takie parametry, które dla tej metody okazały się być najlepsze dla zbioru danych MNIST, co potwierdzają wcześniejsze badania i literatura. Jedynym zmienionym parametrem jest `n_jobs=-1`, który zezwala na trenowanie modelu na wielu rdzeniach procesora. Jest to krok warty podjęcia ze względu na bardzo dużą ilość danych, które trzeba przetworzyć oraz ilość wielkość lasu. Potwierdza to też fakt, iż algorytm losowego lasu decyzyjnego cechuje się dużymi potrzebami obliczeniowymi.
 
 == Sieć neuronowa
-Sieć neuronowa (Neural Network) to model inspirowany biologicznymi neuronami, pogrupowanymi w wiele warstw. Sieć jest trenowana na danych uczących, a proces ten polega na dostosowaniu wag między neuronami w taki sposób, aby zminimalizować błąd predykcji. Według literatury, sieci neuronowe dobrze sprawdzają się przy rozpoznawaniu obiektów i rzekomo gwarantują najlepszą trafność. Sieć neuronowa powstała przy użyciu metod z biblioteki `pytorch`. Posiada ona 2 warstwy konwolucyjne. Pamatery pierwszej warstwy to: `input_channels=1`, `output_channels=32`, `kernel_size=3x3`. Parametry drugiej warstwy to: `input_channels=32`, `output_channels=64`, `kernel_size=3`. Następne 2 wartswy odrzucają odpowiednio 25% i 50% danych. Następne 2 warstwy są liniowe (liniowe transformacje danych z wykorzystaniem uprzednio wyznaczonych wag i biasów), z odpowiednio 9212 i 128 wejściami oraz 128 i 10 wyjściami. Wybraną funkcją aktywacji jest `Relu`. Wykorzystano także optymalizator `Adadelta` z domyślnymi parametrami. 
+Sieć neuronowa stanowi jeden z najbardziej zaawansowanych modeli uczenia maszynowego. Pomysłodawcy inspirowali się biologicznymi neuronami, pogrupowanymi w wiele warstw tworzących sieć. Konwolucyjna sieć neuronowa (Convolutional Neural Network) to zaawansowany architektura sieci neuronowej zaprojektowana do analizy danych w postaci siatki (macierzy) danych jak np. obrazy. Składa się ona z kilku warstw: 
+- konwolucyjna - służy do ekstrakcji cech z obrazu tworząc mapę cech, 
+- aktywacycjna - wprowadza nieliniowość do modelu, 
+- normalizacyjna - redukuje mapę cech agregując dane, 
+- spłaszczająca - przekształcenie mapy cech w wektor, 
+- w pełni połączona - klasyfikuje dane wejściowe,
+- wyjściowa - generowanie ostatecznej predykcji.
+
+Według literatury, sieci neuronowe dobrze sprawdzają się przy rozpoznawaniu obiektów i rzekomo gwarantują najlepszą trafność ze wszystkich badanych metod#text(purple)[, toteż właśnie ten model będzie badany pod kątem rezultatów dla zmienianych parametrów].
+#figure(image("CNN_diagram.png"), caption: "Wizualizacja konwolucyjnej sieci neuronowej.")
+\
+
+Sieć neuronowa powstała przy użyciu metod z biblioteki `pytorch`. Posiada ona 2 warstwy konwolucyjne. Pamatery pierwszej warstwy to: `input_channels=1` - ilość wejść, `output_channels=32` - ilość wyjść, `kernel_size=3x3` - rozmiar filtra ekstrakcji. Parametry drugiej warstwy to: `input_channels=32` - ilość wejść, `output_channels=64` - ilość wyjść, `kernel_size=3` - rozmiar filtra ekstrakcji. Następne 2 wartswy odrzucają odpowiednio 25% i 50% danych. Następne 2 warstwy są liniowe (liniowe transformacje danych z wykorzystaniem uprzednio wyznaczonych wag i biasów), z odpowiednio 9212 i 128 wejściami oraz 128 i 10 wyjściami. Wybraną funkcją aktywacji jest `Relu`. Wykorzystano także optymalizator `Adadelta` z parametrami `self.network.parameters()` - parametry dla każdej z warstw i `lr` - współczynnik skali przed wstawieniem do modułu. 
 
 = Trening modeli
-Kazdy z modeli został wytrenowany na tym samym zbiorze danych treningowych. Zastosowano ustawienia metod identyczne, jak opsiane powyżej. Wykorzystano dane treningowe z MNIST. Dla wszystkich badanych metod zbiór danych teningowych to 60 000 obrazów. Trenowanie odbywa się przy pomocy metody `fit()`. Ocenę treningu przeprowadza się poprzez wywołanie metody `score()` na danych treningowych z zestawy MNIST, który wypisuje się w konsoli. Tworzy się także raport z trenowania `training_report.txt`. \ 
+Kazdy z modeli został wytrenowany na tym samym zbiorze danych treningowych. Zastosowano ustawienia metod identyczne, jak opsiane powyżej. Wykorzystano dane treningowe z MNIST. Dla wszystkich badanych metod zbiór danych teningowych to 60 000 obrazów. Trenowanie odbywa się przy pomocy metody `fit()`. Ocenę treningu przeprowadza się poprzez wywołanie metody `score()` na danych treningowych. 
+\ 
 Sieć neuronowa została wytestowana na 14 epokach. Dane treningowe takie same jak dla pozostałych metod, generowane metodą `DataLoader()` z pamaretrem `batch_size=64` oraz włączonym tasowaniem zbioru. Jakość modelu oceniana jest na postawie wartości funkcji straty oraz dokładności klasyfikacji. Wartości wyznaczane są co epokę i zapisywane są w pliku `training_report.txt`.
 
-== Raport z treningu 
-#text(red)[Zrobić tabelę z wynikami accuracy dla każdej metody, dodać czas trenowania.]
-
+== Czas trenowania modeli
+Pomierzyliśmy czas wytrenowania modeli na komputerze #text(purple)[tu podać swoją specyfikację]. Gdzie było to możliwe, korzystano z wielowątkowości. Czasy trenowania zapisano w tabeli.
 #align(center)[
 #table(
-  columns: (auto, auto),
+  columns: (auto, auto, auto),
   align: horizon,
   table.header(
-        [*Metoda*], [*Accuracy (%)*]
+        [*Metoda*], [*Czas treningu [s]*], [*Czas treningu [min:s]*]
   ),
-  
-  [K-najbliżsi sąsiedzi], [xx.xx],
-  [Liniowa maszyna wektorów nośnych], [xx.xx],
-  [Nieliniowa maszyna wektorów nośnych], [xx.xx],
-  [Losowy las decyzyjny], [xx.xx]
+
+  [K-najbliżsi sąsiedzi], [0.00], [0:00],
+  [Liniowa maszyna wektorów nośnych], [1094.45], [18:14],
+  [Nieliniowa maszyna wektorów nośnych], [138.54], [02:18],
+  [Losowy las decyzyjny], [2.67], [0:03],
+  [Sieć neuronowa], [30.05], [0:31]
 )
-Tabela 1. Wyniki trenowania modeli niebędących siecią neuronową.
-\ 
-#table(
-  columns: (auto, auto),
-  align: horizon,
-  table.header(
-        [*Epoka*], [*Loss*]
-  ),
-  
-  [1], [xx.xx],
-  [2], [yy.yy], 
-  [3], [and so on]
-)
-\
-Tabela 2. Wartość `loss` w kolejnych epokach.
 ]
+
+#text(red)[Dorobić opis tego AI]
 
 = Testowanie modeli
 Dla każdej z metod po uprzednim wytrenowaniu wyznacza się macierz pomyłek, reprezentowaną graficznie. Im bardzej fioletowe punkty poza główną przekątną, tym większa liczba błędów. Na przecięciu wiersza i kolumny widać liczbę obrazów, które zostały zaklasyfikowane jako cyfra z wiersza, a były w rzeczywistości cyfrą z kolumny. Macierz pomyłek powstałą na podstawie dancyh testowych z MNIST (10 000 obrazów). Istnieje też możliowość wytestowania modelu na własnych danych, w folderze `test_data` należy umieścić obrazy do sprawdzenia. Wymaga się, aby cyfry były namalowane czarnym kolorem na białym tle, a obrazek był w proporcjach 1:1 (kwadrat). Wyniki testowania zapisywane są w pliku `testing_report.txt`. Modele można też testować przy użyciu aplikacji `drawing.py`.
 
 #pagebreak()
 
-== Raport z testowania ręcznego
-W tabeli poniżej przedstawiono wyniki testowania modeli na danych opracowanych ręcznie.
-#align(center)[
-#table(
-  columns: (auto, auto, auto, auto, auto, auto),
-  align: horizon,
-  table.header(
-        [*Wartość do rozpoznania*], [*k-najbliżsi sąsiedzi*], [*Liniowa maszyna wektorów nośnych*], [*Nieliniowa maszyna wektorów nośnych*], [*Losowy las decyzyjny*], [*Sieć neuronowa*]
-  ),
-  
-  [1], [✔], [❌], [✔], [✔], [✔],
-  [4 (prosta)], [✔], [❌], [❌], [❌], [❌],
-  [4 (trudna)], [✔], [✔], [✔], [✔], [✔],
-  [9], [❌], [✔], [❌], [❌], [✔]
-)
-\
-Tabela 3. Poprawność rozpoznania danych (testy ręczne).
-]
+== Testy z danych MINST
+
+== Testy z danych własnych
 \
 == Macierze pomyłek
 #pad(
@@ -152,74 +149,8 @@ Po narysowaniu cyfry, obrazek jest przekazywany do modeli. Aby to zrobić, obraz
 
 Operacje na obrazie to krok w dobrą stronę, ponieważ wyraźnie zwiększyła się poprawność rozpoznawania cyfr.
 
-== Moduł generowania raportu
-Po wciśnięciu klawisza 'r' aplikacja zaczyna generować raport. Przed narysowaniem cyfry należy wcisnąć klawisz z cyfrą, którą zamierzamy narysować. Niewciśnięcie klawisza przed rysowaniem uniemożliwia dopisanie do raportu. Po narysowaniu jej zbiera się wynik rozpoznania. Dla każdego modelu i dla każdej cyfry zlicza się, ile razy model poprawnie rozpoznał daną cyfrę a ile razy pomylił się. Wyniki procentowe zapisywane są w pliku `drawing_report.txt`.
-
-== Przykładowe wyniki raportu z aplikacji
-Dane zebrane podczas losowego wybierania cyfr do narysowania.
-#align(center)[
-  #text(font: "Consolas")[
-    Total number of tests: 45 \ \
-RandomForestTreeRecognizer:\
-0: 6.67% correct, 93.33% incorrect \
-1: 24.44% correct, 75.55% incorrect \
-2: 2.22% correct, 97.7% incorrect \
-3: 11.11% correct, 88.88% incorrect \
-4: 31.11% correct, 68.88% incorrect \
-5: 2.22% correct, 97.77% incorrect \
-6: 0.00% correct, 100.00% incorrect \
-7: 2.22% correct, 97.77% incorrect \
-8: 20.00% correct, 80.00% incorrect \
-9: 8.88% correct, 91.11% incorrect \
-\ \
-KNearestNeighborsRecognizer: \
-0: 8.89% correct, 91.11% incorrect \
-1: 20.00% correct, 80.00% incorrect \
-2: 6.67% correct, 93.33% incorrect \
-3: 13.33% correct, 86.67% incorrect \
-4: 22.22% correct, 77.78% incorrect \
-5: 15.56% correct, 84.44% incorrect \
-6: 2.22% correct, 97.78% incorrect \
-7: 4.44% correct, 95.56% incorrect \
-8: 6.67% correct, 93.33% incorrect \
-9: 8.89% correct, 91.11% incorrect \
-\ \
-NonLinearSVMRecognizer:
-0: 4.44% correct, 95.56% incorrect \
-1: 13.33% correct, 86.67% incorrect \
-2: 6.67% correct, 93.33% incorrect \
-3: 11.11% correct, 88.89% incorrect \
-4: 33.33% correct, 66.67% incorrect \
-5: 8.89% correct, 91.11% incorrect \
-6: 6.67% correct, 93.33% incorrect \
-7: 6.67% correct, 93.33% incorrect \
-8: 8.89% correct, 91.11% incorrect \
-9: 8.89% correct, 91.11% incorrect\
-\ \
-LinearSVMRecognizer:
-0: 6.67% correct, 93.33% incorrect \
-1: 6.67% correct, 93.33% incorrect \
-2: 11.11% correct, 88.89% incorrect \
-3: 20.00% correct, 80.00% incorrect \
-4: 6.67% correct, 93.33% incorrect \
-5: 37.78% correct, 62.22% incorrect \
-6: 2.22% correct, 97.78% incorrect \
-7: 4.44% correct, 95.56% incorrect \
-8: 6.67% correct, 93.33% incorrect \
-9: 6.67% correct, 93.33% incorrect\
-\ \
-NeuralNetworkRecognizer: \
-0: 6.66% correct, 93.33% incorrect \
-1: 33.33% correct, 66.66% incorrect \
-2: 8.88% correct, 91.11% incorrect
-3: 6.66% correct, 93.33% incorrect\
-4: 8.88% correct, 91.11% incorrect\
-5: 20.00% correct, 80.00% incorrect\
-6: 0.00% correct, 100.00% incorrect\
-7: 4.44% correct, 95.55% incorrect\
-8: 6.66% correct, 93.33% incorrect\
-9: 13.33% correct, 86.66% incorrect\ ]
-]
+== Czas rozpoznawania
+...
 
 = Obserwacje
 W trakcie prowadzenia badań zaobserwowano, że im większy rysunek w aplikacji `drawing.py`, tym większa szansa na poprawne rozpoznanie. Zapewne ma to związek z późniejszym zmniejszaniem obrazka. Dla szeroko napisanych cyfr, na zmniejszonym obrazie wyraźniej widać przerwy np. ramiona cyfry 4, co zwiększa szansę na poprawne rozpoznanie. \
