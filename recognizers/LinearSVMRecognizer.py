@@ -22,9 +22,9 @@ class LinearSVMRecognizer(Recognizer):
             start_time = time.time()
             self.svc.fit(scale(x), y)
             elapsed_time = time.time() - start_time
+            print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
             MODEL_PATH.parent.mkdir(exist_ok=True)
             joblib.dump(self.svc, MODEL_PATH)
-            print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
         else:
             self.svc = joblib.load(MODEL_PATH)
         

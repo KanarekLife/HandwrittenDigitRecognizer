@@ -7,9 +7,10 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 import time
+import lzma
 from .Recognizer import Recognizer
 
-MODEL_PATH = Path('models/svm_recognizer.pkl')
+MODEL_PATH = Path('models/svm_recognizer.pkl.xz')
 
 class NonLinearSVMRecognizer(Recognizer):
     def __init__(self, dataset: Tensor):
@@ -22,12 +23,20 @@ class NonLinearSVMRecognizer(Recognizer):
             start_time = time.time()
             self.svc.fit(scale(x), y)
             elapsed_time = time.time() - start_time
-            MODEL_PATH.parent.mkdir(exist_ok=True)
-            joblib.dump(self.svc, MODEL_PATH)
             print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
+            self.save()
         else:
-            self.svc = joblib.load(MODEL_PATH)
-        
+            self.load()
+
+    def save(self):
+        MODEL_PATH.parent.mkdir(exist_ok=True)
+        with lzma.open(MODEL_PATH, 'wb') as f:
+            joblib.dump(self.svc, f)
+    
+    def load(self):
+        with lzma.open(MODEL_PATH, 'rb') as f:
+            self.svc = joblib.load(f)
+
     def recognize(self, data: Image) -> int | None:
         arr = convert_from_image(data)
         return self.svc.predict([scale(arr)])[0]

@@ -6,9 +6,10 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 import time
+import lzma
 from .Recognizer import Recognizer
 
-MODEL_PATH = Path('models/knn_model.pkl')
+MODEL_PATH = Path('models/knn_model.pkl.xz')
 
 class KNearestNeighborsRecognizer(Recognizer):
     def __init__(self, dataset: Tensor):
@@ -21,12 +22,20 @@ class KNearestNeighborsRecognizer(Recognizer):
             start_time = time.time()
             self.knn.fit(x, y)
             elapsed_time = time.time() - start_time
-            MODEL_PATH.parent.mkdir(exist_ok=True)
-            joblib.dump(self.knn, MODEL_PATH)
             print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
+            self.save()
         else:
-            self.knn = joblib.load(MODEL_PATH)
-        
+            self.load()
+
+    def save(self):
+        MODEL_PATH.parent.mkdir(exist_ok=True)
+        with lzma.open(MODEL_PATH, 'wb') as f:
+            joblib.dump(self.knn, f)
+    
+    def load(self):
+        with lzma.open(MODEL_PATH, 'rb') as f:
+            self.knn = joblib.load(f)
+
     def recognize(self, data: Image) -> int | None:
         arr = convert_from_image(data)
         return self.knn.predict([arr])[0]

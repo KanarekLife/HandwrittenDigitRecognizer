@@ -22,8 +22,8 @@ class RandomForestTreeRecognizer(Recognizer):
             start_time = time.time()
             self.clf.fit(x, y)
             elapsed_time = time.time() - start_time
-            self.save()
             print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
+            self.save()
         else:
             self.load()
 

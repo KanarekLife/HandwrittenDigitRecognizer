@@ -48,7 +48,7 @@ class NeuralNetworkRecognizer(Recognizer):
         self.device = device
         self.network = Net().to(device)
         self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.SGD(self.network.parameters(), lr=0.01)
+        self.optimizer = torch.optim.Adadelta(self.network.parameters(), lr=1.0)
 
         if MODEL_PATH.exists() and not force_retrain:
             self.network.load_state_dict(torch.load(MODEL_PATH))
@@ -65,9 +65,9 @@ class NeuralNetworkRecognizer(Recognizer):
         for epoch in range(epochs):
             self.train(epoch + 1, train_loader)
         
-        torch.save(self.network.state_dict(), MODEL_PATH)
-
         print("Model trained.")
+
+        torch.save(self.network.state_dict(), MODEL_PATH)
 
     def train(self, epoch: int, train_loader: torch.utils.data.DataLoader):
         self.network.train()
@@ -82,6 +82,8 @@ class NeuralNetworkRecognizer(Recognizer):
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), loss.item()))
+
+    
 
     def recognize(self, image: Image) -> int | None:
         with torch.no_grad():
