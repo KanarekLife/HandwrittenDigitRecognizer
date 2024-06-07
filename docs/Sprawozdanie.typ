@@ -129,11 +129,11 @@ Tabela 3. Poprawność rozpoznania danych (testy ręczne).
 == Macierze pomyłek
 #pad(
     grid(
-      figure(image("docs/KNNConfusionMatrix.png"), caption: "K-najbliżsi sąsiedzi"),
-      figure(image("docs/LinearSVMConfusionMatrix.png"), caption: "Liniowa maszyna wektorów nośnych"),
-      figure(image("docs/NonLinearSVMConfusionMatrix.png"), caption: "Nieliniowa maszyna wektorów nośnych"),
-      figure(image("docs/RandomForestConfusionMatrix.png"), caption: "Losowy las decyzyjny"),
-      figure(image("docs/NeuralNetworkConfusionMatrix.png"), caption: "Sieć neuronowa")
+      figure(image("KNearestNeighborsConfusionMatrix.png"), caption: "K-najbliżsi sąsiedzi"),
+      figure(image("LinearSVMConfusionMatrix.png"), caption: "Liniowa maszyna wektorów nośnych"),
+      figure(image("NonLinearSVMConfusionMatrix.png"), caption: "Nieliniowa maszyna wektorów nośnych"),
+      figure(image("RandomForestTreeConfusionMatrix.png"), caption: "Losowy las decyzyjny"),
+      figure(image("NeuralNetworkConfusionMatrix.png"), caption: "Sieć neuronowa")
     )
   )
 

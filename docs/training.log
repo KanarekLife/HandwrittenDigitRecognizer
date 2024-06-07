@@ -1,0 +1,59 @@
+Training the Random Forest Tree model...
+Model trained. (Elapsed time: 2.67 s)
+Training the KNearest Neighbors model...
+Model trained. (Elapsed time: 0.00 s)
+Training the Non-Linear SVM model...
+Model trained. (Elapsed time: 138.54 s)
+Training the Linear SVM model...
+/mnt/linux_data/Workspace/pg/HandwrittenDigitRecognizer/.venv/lib/python3.12/site-packages/sklearn/svm/_base.py:1237: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
+  warnings.warn(
+Model trained. (Elapsed time: 1094.45 s)
+
+Testing 1.png
+1.png: Random Forest Tree recognized 1
+1.png: KNearest Neighbors recognized 1
+1.png: NonLinear SVM recognized 1
+1.png: Linear SVM recognized 1
+1.png: Neural Network recognized 1
+Testing 4.png
+4.png: Random Forest Tree recognized 8
+4.png: KNearest Neighbors recognized 4
+4.png: NonLinear SVM recognized 8
+4.png: Linear SVM recognized 8
+4.png: Neural Network recognized 8
+Testing 4_hard.png
+4_hard.png: Random Forest Tree recognized 4
+4_hard.png: KNearest Neighbors recognized 4
+4_hard.png: NonLinear SVM recognized 4
+4_hard.png: Linear SVM recognized 4
+4_hard.png: Neural Network recognized 4
+Testing 9.png
+9.png: Random Forest Tree recognized 2
+9.png: KNearest Neighbors recognized 7
+9.png: NonLinear SVM recognized 7
+9.png: Linear SVM recognized 8
+9.png: Neural Network recognized 9
+
+Random Forest Tree tested on training data. (Elapsed time: 0.34 s)
+KNearest Neighbors tested on training data. (Elapsed time: 77.76 s)
+NonLinear SVM tested on training data. (Elapsed time: 261.31 s)
+Linear SVM tested on training data. (Elapsed time: 0.73 s)
+Neural Network tested on training data. (Elapsed time: 7.89 s)
+Training predictions:
+Random Forest Tree accuracy: 1.0000
+KNearest Neighbors accuracy: 0.9819
+NonLinear SVM accuracy: 0.9980
+Linear SVM accuracy: 0.9275
+Neural Network accuracy: 0.9887
+
+Random Forest Tree tested on test data. (Elapsed time: 0.05 s)
+KNearest Neighbors tested on test data. (Elapsed time: 13.01 s)
+NonLinear SVM tested on test data. (Elapsed time: 42.54 s)
+Linear SVM tested on test data. (Elapsed time: 0.12 s)
+Neural Network tested on test data. (Elapsed time: 1.30 s)
+Test predictions:
+Random Forest Tree accuracy: 0.9705
+KNearest Neighbors accuracy: 0.9688
+NonLinear SVM accuracy: 0.9724
+Linear SVM accuracy: 0.9155
+Neural Network accuracy: 0.9834
