@@ -1,76 +1,71 @@
 import os
-from sklearn.preprocessing import scale
 from torchvision import datasets
-from KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
-from RandomForestTreeRecognizer import RandomForestTreeRecognizer
-from NonLinearSVMRecognizer import NonLinearSVMRecognizer
-from LinearSVMRecognizer import LinearSVMRecognizer
-from NeuralNetworkRecognizer import NeuralNetworkRecognizer
+from recognizers.all_recognizers import (RandomForestTreeRecognizer, KNearestNeighborsRecognizer,
+                                     NonLinearSVMRecognizer, LinearSVMRecognizer, NeuralNetworkRecognizer)
+from recognizers.Recognizer import Recognizer
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
-from utils import parse_data, parse_labels, append_to_report, remove_existing_reports
+from utils import parse_data, parse_labels
 from PIL import Image
+import numpy as np
+import time
 
 training_dataset = datasets.MNIST('./data', train=True, download=True)
 
-remove_existing_reports()
-append_to_report("Training the models...\n")
-
-
-recognizers = [
-    RandomForestTreeRecognizer(training_dataset),
-    KNearestNeighborsRecognizer(training_dataset),
-    NonLinearSVMRecognizer(training_dataset),
-    LinearSVMRecognizer(training_dataset),
-    NeuralNetworkRecognizer(training_dataset, 'cpu', 14),
-]
+recognizers: dict[str, Recognizer] = {
+    # "Random Forest Tree": RandomForestTreeRecognizer(training_dataset),
+    # "KNearest Neighbors": KNearestNeighborsRecognizer(training_dataset),
+    # "NonLinear SVM": NonLinearSVMRecognizer(training_dataset),
+    # "Linear SVM": LinearSVMRecognizer(training_dataset),
+    "Neural Network": NeuralNetworkRecognizer(training_dataset, 'cuda', epochs=14),
+}
 
 #Manual Tests
 for file in os.listdir("test_data/"):
     image = Image.open("test_data/" + file)
     print(f"Testing {file}")
-    for recognizer in recognizers:
-        print(f"{file}: {recognizer.__class__.__name__} recognized {recognizer.recognize(image)}")
-        append_to_report(f"{file}: {recognizer.__class__.__name__} recognized {recognizer.recognize(image)}", "testing")
-        
-        
+    for name, recognizer in recognizers.items():
+        print(f"{file}: {name} recognized {recognizer.recognize(image)}")
+
+print()
 
 #Automated Tests
+x_train = parse_data(training_dataset)
+y_train = parse_labels(training_dataset)
+
+predictions_train = {}
+for name, recognizer in recognizers.items():
+    start_time = time.time()
+    predictions_train[name] = recognizer.recognize_batch(x_train)
+    elapsed_time = time.time() - start_time
+    print(f"{name} tested on training data. (Elapsed time: {elapsed_time:.2f} s)")
+
+print("Training predictions:")
+for name, prediction in predictions_train.items():
+    accuracy = sum(prediction == y_train) / len(y_train)
+    print(f"{name} accuracy: {accuracy:.4f}")
+
 test_dataset = datasets.MNIST('./data', train=False, download=True)
 x_test = parse_data(test_dataset)
-y_expected = parse_labels(test_dataset)
+y_test = parse_labels(test_dataset)
 
-random_forest_predictions = recognizers[0].recognize_batch(x_test)
-knn_predictions = recognizers[1].recognize_batch(x_test)
-nonlinear_svm_predictions = recognizers[2].recognize_batch(scale(x_test))
-nn_predictions = recognizers[4].recognize_batch(x_test)
-linear_svm_predictions = recognizers[3].recognize_batch(scale(x_test))
+predictions_test: dict[str, np.ndarray] = {}
+for name, recognizer in recognizers.items():
+    start_time = time.time()
+    predictions_test[name] = recognizer.recognize_batch(x_test)
+    elapsed_time = time.time() - start_time
+    print(f"{name} tested on test data. (Elapsed time: {elapsed_time:.2f} s)")
 
+print()
 
-plt.matshow(confusion_matrix(y_expected, random_forest_predictions))
-plt.title("Random Forest Confusion Matrix")
-plt.savefig('docs/RandomForestConfusionMatrix.png')
-plt.show()
+print("Test predictions:")
+for name, prediction in predictions_test.items():
+    accuracy = sum(prediction == y_test) / len(y_test)
+    print(f"{name} accuracy: {accuracy:.4f}")
 
-
-plt.matshow(confusion_matrix(y_expected, knn_predictions))
-plt.title("KNN Confusion Matrix")
-plt.savefig('docs/KNNConfusionMatrix.png')
-plt.show()
-
-
-plt.matshow(confusion_matrix(y_expected, nonlinear_svm_predictions))
-plt.title("NonLinear SVM Confusion Matrix")
-plt.savefig('docs/NonLinearSVMConfusionMatrix.png')
-plt.show()
-
-plt.matshow(confusion_matrix(y_expected, linear_svm_predictions))
-plt.title("Linear SVM Confusion Matrix")
-plt.savefig('docs/LinearSVMConfusionMatrix.png')
-plt.show()
-
-
-plt.matshow(confusion_matrix(y_expected, nn_predictions))
-plt.title("Neural Network Confusion Matrix")
-plt.savefig('docs/NeuralNetworkConfusionMatrix.png')
-plt.show()
+for name, prediction in predictions_test.items():
+    confusion = confusion_matrix(y_test, prediction)
+    plt.matshow(confusion)
+    plt.title(f"{name} Confusion Matrix")
+    plt.savefig(f'docs/{name.replace(" ", "")}ConfusionMatrix.png')
+    plt.show()

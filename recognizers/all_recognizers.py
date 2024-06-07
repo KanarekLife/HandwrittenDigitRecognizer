@@ -1,0 +1,5 @@
+from .KNearestNeighborsRecognizer import KNearestNeighborsRecognizer
+from .LinearSVMRecognizer import LinearSVMRecognizer
+from .NeuralNetworkRecognizer import NeuralNetworkRecognizer
+from .NonLinearSVMRecognizer import NonLinearSVMRecognizer
+from .RandomForestTreeRecognizer import RandomForestTreeRecognizer
