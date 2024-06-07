@@ -13,11 +13,11 @@ import time
 training_dataset = datasets.MNIST('./data', train=True, download=True)
 
 recognizers: dict[str, Recognizer] = {
-    "Random Forest Tree": RandomForestTreeRecognizer(training_dataset),
-    "KNearest Neighbors": KNearestNeighborsRecognizer(training_dataset),
-    "NonLinear SVM": NonLinearSVMRecognizer(training_dataset),
-    "Linear SVM": LinearSVMRecognizer(training_dataset),
-    "Neural Network": NeuralNetworkRecognizer(training_dataset, 'cpu', epochs=14),
+    # "Random Forest Tree": RandomForestTreeRecognizer(training_dataset),
+    # "KNearest Neighbors": KNearestNeighborsRecognizer(training_dataset),
+    # "NonLinear SVM": NonLinearSVMRecognizer(training_dataset),
+    # "Linear SVM": LinearSVMRecognizer(training_dataset),
+    "Neural Network": NeuralNetworkRecognizer(training_dataset, 'cuda', epochs=14),
 }
 
 #Manual Tests

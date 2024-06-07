@@ -8,6 +8,8 @@ Training the Linear SVM model...
 /mnt/linux_data/Workspace/pg/HandwrittenDigitRecognizer/.venv/lib/python3.12/site-packages/sklearn/svm/_base.py:1237: ConvergenceWarning: Liblinear failed to converge, increase the number of iterations.
   warnings.warn(
 Model trained. (Elapsed time: 1094.45 s)
+Training the Neural Network model...
+Model trained. (Elapsed time: 30.05 s)
 
 Testing 1.png
 1.png: Random Forest Tree recognized 1

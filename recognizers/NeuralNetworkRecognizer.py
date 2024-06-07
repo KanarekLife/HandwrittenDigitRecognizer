@@ -8,6 +8,7 @@ from PIL import Image
 from pathlib import Path
 import numpy as np
 from utils import center_image, normalize_image
+import time
 from .Recognizer import Recognizer
 
 MODEL_PATH = Path('models/nn_model.pth')
@@ -47,7 +48,7 @@ class NeuralNetworkRecognizer(Recognizer):
     def __init__(self, dataset: torch.utils.data.Dataset, device: DeviceLikeType, epochs: int = 10, force_retrain: bool = False):
         self.device = device
         self.network = Net().to(device)
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = F.nll_loss
         self.optimizer = torch.optim.Adadelta(self.network.parameters(), lr=1.0)
 
         if MODEL_PATH.exists() and not force_retrain:
@@ -62,10 +63,12 @@ class NeuralNetworkRecognizer(Recognizer):
         dataset.transform = transform
         train_loader = torch.utils.data.DataLoader(dataset, batch_size=64, shuffle=True, **loader_prefs)
 
+        start_time = time.time()
         for epoch in range(epochs):
             self.train(epoch + 1, train_loader)
+        elapsed_time = time.time() - start_time
         
-        print("Model trained.")
+        print(f"Model trained. (Elapsed time: {elapsed_time:.2f} s)")
 
         torch.save(self.network.state_dict(), MODEL_PATH)
 
