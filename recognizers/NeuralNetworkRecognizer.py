@@ -52,7 +52,7 @@ class NeuralNetworkRecognizer(Recognizer):
         self.optimizer = torch.optim.Adadelta(self.network.parameters(), lr=1.0)
 
         if MODEL_PATH.exists() and not force_retrain:
-            self.network.load_state_dict(torch.load(MODEL_PATH))
+            self.network.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device(device)))
             self.network.eval()
             return
 
