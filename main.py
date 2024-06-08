@@ -13,21 +13,49 @@ import time
 training_dataset = datasets.MNIST('./data', train=True, download=True)
 
 recognizers: dict[str, Recognizer] = {
-    # "Random Forest Tree": RandomForestTreeRecognizer(training_dataset),
-    # "KNearest Neighbors": KNearestNeighborsRecognizer(training_dataset),
-    # "NonLinear SVM": NonLinearSVMRecognizer(training_dataset),
-    # "Linear SVM": LinearSVMRecognizer(training_dataset),
-    "Neural Network": NeuralNetworkRecognizer(training_dataset, 'cuda', epochs=14),
+    "Random Forest Tree": RandomForestTreeRecognizer(training_dataset),
+    "KNearest Neighbors": KNearestNeighborsRecognizer(training_dataset),
+    "NonLinear SVM": NonLinearSVMRecognizer(training_dataset),
+    "Linear SVM": LinearSVMRecognizer(training_dataset),
+    "Neural Network": NeuralNetworkRecognizer(training_dataset, 'cpu', epochs=14),
 }
 
 #Manual Tests
 for file in os.listdir("test_data/"):
+    if os.path.isdir("test_data/" + file):
+        continue
+    
     image = Image.open("test_data/" + file)
     print(f"Testing {file}")
     for name, recognizer in recognizers.items():
         print(f"{file}: {name} recognized {recognizer.recognize(image)}")
 
-print()
+print("Manual tests (example data) done.")
+
+#Manual tests - data from people
+
+N = len([name for name in os.listdir("test_data/people") if os.path.isdir("test_data/people/" + name)])
+
+print(f"Recognisers: ")
+for recognizer in recognizers:
+    print(f"{recognizer}", end=", ")
+print("expected result")
+
+for i in range(1, N+1):
+    print(f"Person #{i}")
+    for file in os.listdir(f"test_data/people/drawn_digits_{i}"):
+        image = Image.open(f"test_data/people/drawn_digits_{i}/" + file)
+        #print(f"Testing {file}")
+
+        for name, recognizer in recognizers.items():
+            print(f"{recognizer.recognize(image)}", end=",")
+        
+        tested_digit = file.split("_")
+        # should be: 
+        print(f"{ tested_digit[1] }")
+    print()
+print("Manual tests (data from people) done.")
+
 
 #Automated Tests
 x_train = parse_data(training_dataset)
