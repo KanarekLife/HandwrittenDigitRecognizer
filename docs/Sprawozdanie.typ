@@ -101,14 +101,14 @@ Pomierzyliśmy czas wytrenowania modeli na komputerze #text(purple)[tu podać sw
   columns: (auto, auto, auto),
   align: horizon,
   table.header(
-        [*Metoda*], [*Czas treningu [s]*], [*Czas treningu [min:s]*]
+        [*Metoda*], [*Czas treningu [min:s]*]
   ),
 
-  [K-najbliżsi sąsiedzi], [0.00], [0:00],
-  [Liniowa maszyna wektorów nośnych], [1094.45], [18:14],
-  [Nieliniowa maszyna wektorów nośnych], [138.54], [02:18],
-  [Losowy las decyzyjny], [2.67], [0:03],
-  [Sieć neuronowa], [30.05], [0:31]
+  [K-najbliżsi sąsiedzi], [0:00],
+  [Liniowa maszyna wektorów nośnych], [18:14],
+  [Nieliniowa maszyna wektorów nośnych], [02:18],
+  [Losowy las decyzyjny], [0:03],
+  [Sieć neuronowa], [0:31]
 )
 ]
 
@@ -208,9 +208,6 @@ Po narysowaniu cyfry, obrazek jest przekazywany do modeli. Aby to zrobić, obraz
 + wycentrowanie cyfry
 
 Operacje na obrazie to krok w dobrą stronę, ponieważ wyraźnie zwiększyła się poprawność rozpoznawania cyfr.
-
-== Czas rozpoznawania
-...
 
 = Obserwacje
 W trakcie prowadzenia badań zaobserwowano, że im większy rysunek w aplikacji `drawing.py`, tym większa szansa na poprawne rozpoznanie. Zapewne ma to związek z późniejszym zmniejszaniem obrazka. Dla szeroko napisanych cyfr, na zmniejszonym obrazie wyraźniej widać przerwy np. ramiona cyfry 4, co zwiększa szansę na poprawne rozpoznanie. \
