@@ -113,7 +113,7 @@ Do testów wykorzystano sprzęt o następujących parametrach:
 Gdzie było to możliwe, korzystano z wielowątkowości. Czasy trenowania zapisano w tabeli.
 #align(center)[
 #table(
-  columns: (auto, auto, auto),
+  columns: (auto, auto),
   align: horizon,
   table.header(
         [*Metoda*], [*Czas treningu [min:s]*]
