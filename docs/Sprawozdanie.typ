@@ -151,7 +151,7 @@ Rezultaty z testów na danych treningowych przedstawia poniższa tabela.
 Dokładność każdego z modeli jest zadowalająca. Modele powinny dobrze radzić sobie z klasyfikacją danych testowych. Przy okazji obserwujemy, że najwolniejszym z modeli jest nieliniowa maszyna wektorów nośnych, co jest zgodne z przewidywaniami (złożność nie mniejsza niż kwadratowa). Drugim najwolniejszym modelem okazał się model k-najbliższych sąsiadów, co jest zaskakujące, ponieważ jest to jedna z najprostszych metod. Czas testu dla sieci neuronowej jest zadowalający, co może świadczyć o dobrej optymalizacji modelu (zapewne wiele pomogła wielowątkowość). Czas działania pozostałych modeli jest zgodny z oczekiwaniami.
 
 == Testy z danych MNIST
-Rezultaty z testów na danych treningowych przedstawia poniższa tabela. 
+Rezultaty z testów na danych testowych z MNIST przedstawia poniższa tabela. 
 #align(center)[
 #table(
   columns: (auto, auto, auto),
